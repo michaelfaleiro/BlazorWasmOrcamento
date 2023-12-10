@@ -1,0 +1,110 @@
+﻿@page "/orcamentos"
+@inject IOrcamentoService OrcamentoService
+
+<PageTitle>Orcamentos</PageTitle>
+
+<h3>Orcamentos</h3>
+
+<button @onclick="ShowModal" class="btn btn-secondary">Novo Orcamento</button>
+
+@if (ShowCreateOrcamento)
+{
+    <Create ShowCreateOrcamento="@ShowCreateOrcamento" ModalFechada="HandleModalFechada" CarregarDados="CarregarDados" />
+}
+
+
+@if (CarregandoMessage)
+{
+    <p> Carregando dados....</p>
+}
+
+
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>
+                Cliente
+            </th>
+            <th>
+                Veiculo
+            </th>
+            <th>
+                Placa
+            </th>
+            <th>
+                Chassi
+            </th>
+            <th>
+                Data Criação
+            </th>
+            <th>
+
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var orcamento in OrcamentoService.Orcamentos)
+        {
+            <tr>
+                <td>
+                    @orcamento.Cliente
+                </td>
+                <td>
+                    @orcamento.Veiculo
+                </td>
+                <td>
+                    @orcamento.Placa
+                </td>
+                <td>
+                    @orcamento.Chassi
+                </td>
+                <td>
+                    @orcamento.DataCriacao.ToShortDateString()
+                </td>
+                <td>
+                    <a class="btn btn-primary" href="/orcamentos/details/@orcamento.Id">Editar</a>
+                    <button class="btn btn-danger" @onclick="async ()=> await RemoveOrcamento(orcamento.Id)">Apagar</button>
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+
+
+
+@code {
+    public List<Models.Orcamento?> Orcamentos = [];
+
+    public bool CarregandoMessage { get; set; } = true;
+    public bool ShowCreateOrcamento { get; set; } = false;
+
+    void ShowModal()
+    {
+        ShowCreateOrcamento = !ShowCreateOrcamento;
+    }
+
+    private void HandleModalFechada(bool modalFechada)
+    {
+        ShowCreateOrcamento = modalFechada;
+    }
+
+    private async Task CarregarDados()
+    {
+        await OrcamentoService.GetOrcamentoAsync();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        CarregandoMessage = true;
+        await CarregarDados();
+        CarregandoMessage = false;
+    }
+
+    private async Task RemoveOrcamento(Guid id)
+    {
+        await OrcamentoService.DeleteOrcamento((Guid)id);
+        await CarregarDados();
+    }
+}

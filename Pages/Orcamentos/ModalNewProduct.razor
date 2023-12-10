@@ -1,0 +1,84 @@
+@inject IOrcamentoService OrcamentoService
+
+<EditForm Model="Produto" OnValidSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="row">
+        <div class="col-1">
+            <label for="Quantidade" class="form-label">Quantidade</label>
+            <InputNumber id="Quantidade" class="form-control" @bind-Value="Produto.Quantidade" />
+        </div>
+
+        <div class="col-3">
+            <label for="Sku" class="form-label">Sku</label>
+            <InputText id="Sku" class="form-control" @bind-Value="Produto.Sku" />
+        </div>
+
+        <div class="col-6">
+            <label for="NomeProduto" class="form-label">Produto</label>
+            <InputText id="NomeProduto" class="form-control" @bind-Value="Produto.NomeProduto" />
+        </div>
+
+        <div class="col-2">
+            <label for="Marca" class="form-label">Marca</label>
+            <InputText id="Marca" class="form-control" @bind-Value="Produto.Marca" />
+        </div>
+
+
+    </div>
+    <div class="row">
+
+        <div class="col-1">
+            <label for="PrecoCusto" class="form-label">Custo</label>
+            <InputNumber id="PrecoCusto" class="form-control" @bind-Value="Produto.PrecoCusto" />
+        </div>
+
+        <div class="col-1">
+            <label for="PrecoVenda" class="form-label">Venda</label>
+            <InputNumber id="PrecoVenda" class="form-control" @bind-Value="Produto.PrecoVenda" />
+        </div>
+        <div class="col">
+            <label for="Link" class="form-label">Link</label>
+            <InputText id="Link" class="form-control" @bind-Value="Produto.Link" />
+        </div>
+
+        <div class="col">
+            <label for="Observacao" class="form-label">Observacao</label>
+            <InputText id="Observacao" class="form-control" @bind-Value="Produto.Observacao" />
+        </div>
+
+
+    </div>
+    <div class="mt-1">
+        <button class="btn-sm btn-success " type="submit">
+            <i class="bi bi-basket"></i>
+            Adicionar
+        </button>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public Guid OrcamentoId { get; set; }
+
+    public Produto Produto = new();
+
+    [Parameter]
+    public bool ShowModalProduto { get; set; } = false;
+
+    [Parameter]
+    public EventCallback<bool> ModalFechada { get; set; }
+
+    [Parameter]
+    public EventCallback CarregarDados { get; set; }
+
+    async Task HandleSubmit()
+    {
+        Produto.OrcamentoId = OrcamentoId;
+        await OrcamentoService.AddProdutoOrcamentoAsync(Produto);
+        ShowModalProduto = false;
+        await ModalFechada.InvokeAsync(ShowModalProduto);
+        await CarregarDados.InvokeAsync(CarregarDados);
+    }
+}

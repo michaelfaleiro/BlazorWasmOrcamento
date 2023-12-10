@@ -1,0 +1,60 @@
+﻿@* @page "/orcamentos/create" *@
+@inject IOrcamentoService OrcamentoService
+
+
+<div class="w-50">
+    <EditForm Model="Model" OnValidSubmit="HandleSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="row">
+            <div class="col">
+                <label for="cliente" class="form-label">Cliente</label>
+                <InputText class="form-control" id="cliente" @bind-Value="Model.Cliente" />
+            </div>
+            <div class="col">
+                <label for="veiculo" class="form-label">Veículo</label>
+                <InputText class="form-control" id="veiculo" @bind-Value="Model.Veiculo" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <label for="placa" class="form-label">Placa</label>
+                <InputText class="form-control" id="placa" @bind-Value="Model.Placa" />
+            </div>
+
+            <div class="col">
+                <label for="chassi" class="form-label">Chassi</label>
+                <InputText class="form-control" id="chassi" @bind-Value="Model.Chassi" />
+            </div>
+        </div>
+
+        <dir class="">
+            <button type="submit" class="btn btn-primary">Criar</button>
+        </dir>
+
+    </EditForm>
+
+</div>
+@code {
+    [Parameter]
+    public bool ShowCreateOrcamento { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> ModalFechada { get; set; }
+
+    [Parameter]
+    public EventCallback CarregarDados { get; set; }
+
+    Models.Orcamento Model { get; set; } = new();
+
+
+    async Task HandleSubmit()
+    {
+        await OrcamentoService.CreateOrcamentoAsync(Model!);
+        ShowCreateOrcamento = false;
+        await ModalFechada.InvokeAsync(ShowCreateOrcamento);
+        await CarregarDados.InvokeAsync(CarregarDados);
+    }
+}
